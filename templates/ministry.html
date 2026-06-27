@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHCS - Central Health Ministry Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #ef4444;
+            --success: #10b981;
+            --card-border: #e2e8f0;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --card-border: #334155;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card h3 {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card .live-badge {
+            display: inline-block;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 9999px;
+            margin-top: 0.4rem;
+            font-weight: 600;
+        }
+
+        .warning-banner {
+            background-color: rgba(239, 68, 68, 0.08);
+            border-left: 5px solid var(--accent);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .grid-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.4rem;
+            display: inline-block;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 350px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            background-image: radial-gradient(#ccc 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        [data-theme="dark"] .map-container {
+            background-image: radial-gradient(#444 1.5px, transparent 1.5px);
+        }
+
+        .outbreak-pin {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background-color: var(--accent);
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: rgba(30, 58, 138, 0.05);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .badge-z { background-color: rgba(239, 68, 68, 0.1); color: var(--accent); padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; }
+        .badge-ap { background-color: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; }
+        .badge-a { background-color: rgba(2, 132, 199, 0.1); color: var(--secondary); padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; }
+        .badge-n { background-color: rgba(100, 116, 139, 0.1); color: #64748b; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; }
+        .badge-b { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏛️ MOHFW Central Ministry Dashboard</h1>
+        <button class="mode-toggle" id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <!-- Warning banner for Z grade hospitals -->
+    <div class="warning-banner" id="z-warning-banner">
+        <span>⚠️</span>
+        <div>
+            <strong>CRITICAL WARNING:</strong> "Warning Clinic Mymensingh" is currently graded <strong>Z</strong>. According to regulatory audit bylaws, Z-rated hospitals must achieve a B-rating improvement or cease operations within 12 months.
+        </div>
+    </div>
+
+    <div class="grid-stats">
+        <div class="stat-card">
+            <h3>Registered Patients</h3>
+            <div class="value" id="stat-patients">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Medical Centers</h3>
+            <div class="value" id="stat-hospitals">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>BMDC Doctors</h3>
+            <div class="value" id="stat-doctors">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Live Births Today</h3>
+            <div class="value" id="stat-births">345</div>
+            <span class="live-badge">🔴 LIVE</span>
+        </div>
+        <div class="stat-card">
+            <h3>Live Deaths Today</h3>
+            <div class="value" id="stat-deaths">89</div>
+            <span class="live-badge">🔴 LIVE</span>
+        </div>
+    </div>
+
+    <div class="grid-main">
+        <!-- Outbreak surveillance & AI Density Clustering map -->
+        <div>
+            <div class="panel-card">
+                <h2>AI Epidemic Geographic Density Map</h2>
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">Clusters identify disease similarity hot spots by geographical area based on active clinician reports.</p>
+                <div class="map-container" id="outbreak-map">
+                    <!-- Outbreak pins are plotted dynamically -->
+                </div>
+            </div>
+
+            <!-- Outbreak statistics list -->
+            <div class="panel-card">
+                <h2>Disease Outbreaks & Senior Expert Guidelines</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Disease Cluster</th>
+                            <th>District</th>
+                            <th>Active Reports</th>
+                            <th>Risk Guideline Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="outbreak-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Malpractice list -->
+            <div class="panel-card">
+                <h2>Patient Malpractice & Poor Service Feed</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hospital</th>
+                            <th>Doctor</th>
+                            <th>Incident Summary</th>
+                            <th>Severity Score</th>
+                            <th>Logged At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="malpractice-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Auditor Team Panel & Hospital list -->
+        <div>
+            <div class="panel-card">
+                <h2>Auditor Team panel</h2>
+                <form id="audit-form">
+                    <div class="form-group">
+                        <label for="audit-hospital">Hospital ID to Review</label>
+                        <select id="audit-hospital">
+                            <option value="h1">Mymensingh Medical College (A+)</option>
+                            <option value="h2">Rajshahi Medical College (A)</option>
+                            <option value="h3">Dhaka Medical College (A+)</option>
+                            <option value="h4">Warning Clinic Mymensingh (Z)</option>
+                            <option value="h5">New Hope Health Clinic (N)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-count">Yearly Patient Count</label>
+                        <input type="number" id="audit-count" value="10000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-satisfaction">Patient Satisfaction (1.0 - 5.0)</label>
+                        <input type="number" id="audit-satisfaction" step="0.1" min="1.0" max="5.0" value="4.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-cure">Cure Rate vs Follow-ups (%)</label>
+                        <input type="number" id="audit-cure" min="0" max="100" value="85" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-equipment">Equipment Quality (1.0 - 5.0)</label>
+                        <input type="number" id="audit-equipment" step="0.1" min="1.0" max="5.0" value="4.2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-expert">Expert Doctor Count</label>
+                        <input type="number" id="audit-expert" value="15" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-cleanliness">Cleanliness (1.0 - 5.0)</label>
+                        <input type="number" id="audit-cleanliness" step="0.1" min="1.0" max="5.0" value="4.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-food">Food Quality (1.0 - 5.0)</label>
+                        <input type="number" id="audit-food" step="0.1" min="1.0" max="5.0" value="3.5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audit-architecture">Architecture Score (1.0 - 5.0)</label>
+                        <input type="number" id="audit-architecture" step="0.1" min="1.0" max="5.0" value="4.0" required>
+                    </div>
+
+                    <button type="submit" class="btn">Submit Audit & Re-calculate Grade</button>
+                </form>
+            </div>
+
+            <!-- Hospital List -->
+            <div class="panel-card">
+                <h2>Hospital Grades & Audited Tiers</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hospital</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hospital-grades-tbody">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        // Initialize Leaflet Map
+        const map = L.map('outbreak-map', {
+            zoomControl: true,
+            scrollWheelZoom: false
+        }).setView([23.6850, 90.3563], 7); // Center of Bangladesh
+
+        // Map styles
+        let tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        function updateMapTheme(theme) {
+            map.removeLayer(tileLayer);
+            if (theme === 'dark') {
+                tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+            } else {
+                tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+            }
+        }
+        updateMapTheme(currentTheme);
+
+        // Load Bangladesh GeoJSON boundary & districts overlay
+        let geojsonLayer;
+        fetch('/static/bangladesh.geojson')
+            .then(res => res.json())
+            .then(geoData => {
+                geojsonLayer = L.geoJSON(geoData, {
+                    style: function(feature) {
+                        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                        return {
+                            fillColor: '#3b82f6',
+                            weight: 1,
+                            opacity: 0.5,
+                            color: isDark ? '#475569' : '#1e3a8a',
+                            fillOpacity: 0.05
+                        };
+                    }
+                }).addTo(map);
+            });
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+            updateMapTheme(newTheme);
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(layer => {
+                    geojsonLayer.resetStyle(layer);
+                });
+            }
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                toggleBtn.innerHTML = '☀️ Light Mode';
+            } else {
+                toggleBtn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+
+        // Live birth/death ticker
+        setInterval(() => {
+            const births = document.getElementById('stat-births');
+            const deaths = document.getElementById('stat-deaths');
+            if (births && deaths) {
+                births.textContent = parseInt(births.textContent) + (Math.random() > 0.4 ? 1 : 0);
+                deaths.textContent = parseInt(deaths.textContent) + (Math.random() > 0.7 ? 1 : 0);
+            }
+        }, 4000);
+
+        function loadDashboard() {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('stat-patients').textContent = data.summary.patients;
+                    document.getElementById('stat-hospitals').textContent = data.summary.hospitals;
+                    document.getElementById('stat-doctors').textContent = data.summary.doctors;
+
+                    // Outbreak table list & Expert Guidelines
+                    const tbody = document.getElementById('outbreak-table-body');
+                    tbody.innerHTML = '';
+                    
+                    const guidelines = {
+                        "Dengue Fever": "Clear standing water reservoirs, distribute insecticidal mosquito nets in clusters, and stock platelet concentrate.",
+                        "Cholera": "Boil drinking water, distribute intravenous saline hydration fluids, and initialize localized vaccination loops.",
+                        "Hypertension": "Introduce generic salt reduction guidelines, publish exercise reminders, and stock amlodipine."
+                    };
+
+                    data.diseases.forEach(d => {
+                        const tr = document.createElement('tr');
+                        const guide = guidelines[d.disease] || "Monitor patients, log symptoms, and stock generic symptom remedy plans.";
+                        tr.innerHTML = `
+                            <td><strong>${d.disease}</strong></td>
+                            <td>${d.district}</td>
+                            <td><span style="color:#ef4444; font-weight:bold;">${d.count} reports</span></td>
+                            <td>${guide}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+
+            // Outbreaks geo markers
+            fetch('/api/outbreaks_geo')
+                .then(res => res.json())
+                .then(data => {
+                    // Clear existing markers
+                    map.eachLayer((layer) => {
+                        if (layer instanceof L.CircleMarker && !(layer instanceof L.GeoJSON)) {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    
+                    data.forEach(o => {
+                        const marker = L.circleMarker([o.lat, o.lng], {
+                            radius: 8,
+                            fillColor: '#ef4444',
+                            color: '#ffffff',
+                            weight: 1.5,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        }).addTo(map);
+                        
+                        marker.bindPopup(`
+                            <div style="font-family:'Outfit', sans-serif;">
+                                <strong style="color:#ef4444; font-size:1rem;">⚠️ ${o.disease} Outbreak</strong><br>
+                                <strong>District:</strong> ${o.district}<br>
+                                <strong>Symptoms:</strong> ${o.symptoms}<br>
+                                <span style="font-size:0.8rem; color:#64748b;">Reported: ${o.timestamp}</span>
+                            </div>
+                        `);
+                    });
+                });
+
+            // Hospital Grades list
+            // Fetch list of grades for each seeded hospital
+            const h_ids = ["h1", "h2", "h3", "h4", "h5"];
+            const h_tbody = document.getElementById('hospital-grades-tbody');
+            h_tbody.innerHTML = '';
+            
+            let showZWarning = false;
+
+            Promise.all(h_ids.map(id => fetch(`/api/hospital_grade?hospital_id=${id}`).then(res => res.json())))
+                .then(results => {
+                    results.forEach(res => {
+                        if (res.success) {
+                            const tr = document.createElement('tr');
+                            let ratingClass = 'badge-b';
+                            if (res.details.rating === 'A+') ratingClass = 'badge-ap';
+                            else if (res.details.rating === 'A') ratingClass = 'badge-a';
+                            else if (res.details.rating === 'N') ratingClass = 'badge-n';
+                            else if (res.details.rating === 'Z') {
+                                ratingClass = 'badge-z';
+                                showZWarning = true;
+                            }
+                            
+                            tr.innerHTML = `
+                                <td><strong>${res.details.name}</strong></td>
+                                <td><span class="${ratingClass}">${res.details.rating}</span></td>
+                            `;
+                            h_tbody.appendChild(tr);
+                        }
+                    });
+                    
+                    document.getElementById('z-warning-banner').style.display = showZWarning ? 'flex' : 'none';
+                });
+
+            // Malpractice list load
+            fetch('/api/malpractice_list')
+                .then(res => res.json())
+                .then(data => {
+                    const m_tbody = document.getElementById('malpractice-table-body');
+                    m_tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        m_tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">No malpractice logs registered.</td></tr>';
+                    } else {
+                        data.forEach(r => {
+                            const tr = document.createElement('tr');
+                            const dateOnly = r.timestamp.split(' ')[0];
+                            tr.innerHTML = `
+                                <td><strong>${r.hospital_name}</strong></td>
+                                <td>${r.doctor_name || 'N/A'}</td>
+                                <td>${r.incident_summary}</td>
+                                <td><span style="color:#ef4444; font-weight:bold;">${r.rating}/5</span></td>
+                                <td>${dateOnly}</td>
+                            `;
+                            m_tbody.appendChild(tr);
+                        });
+                    }
+                });
+        }
+
+        // Audit form submission
+        document.getElementById('audit-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const h_id = document.getElementById('audit-hospital').value;
+            const count = parseInt(document.getElementById('audit-count').value);
+            const sat = parseFloat(document.getElementById('audit-satisfaction').value);
+            const cure = parseFloat(document.getElementById('audit-cure').value);
+            const equip = parseFloat(document.getElementById('audit-equipment').value);
+            const expert = parseInt(document.getElementById('audit-expert').value);
+            const cleanliness = parseFloat(document.getElementById('audit-cleanliness').value);
+            const food = parseFloat(document.getElementById('audit-food').value);
+            const architecture = parseFloat(document.getElementById('audit-architecture').value);
+
+            fetch('/api/submit_audit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    hospital_id: h_id,
+                    patient_count_yearly: count,
+                    satisfaction_score: sat,
+                    cure_rate: cure,
+                    equipment_score: equip,
+                    expert_doctor_count: expert,
+                    cleanliness_score: cleanliness,
+                    food_score: food,
+                    architecture_score: architecture
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Audit committed successfully! Calculated new Rating: ${data.new_rating}`);
+                    loadDashboard();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Initialize dashboard load
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHCS - Patient Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #e67e22;
+            --danger: #ef4444;
+            --card-border: #e2e8f0;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --accent: #f39c12;
+            --danger: #ff4757;
+            --card-border: #334155;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .nid-badge {
+            background-color: rgba(2, 132, 199, 0.1);
+            color: var(--secondary);
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: var(--bg-color);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            width: 65%;
+            border-radius: 9999px;
+        }
+
+        .med-alert {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background-color: rgba(230, 126, 34, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed var(--card-border);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .nurse-ai-box {
+            background-color: rgba(2, 132, 199, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px dashed var(--secondary);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📱 My NCHDS Citizen Portal</h1>
+        <button class="mode-toggle" id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <!-- Login Area -->
+    <div class="panel-card" style="max-width: 600px; margin: 0 auto 2rem auto;">
+        <h2>National Citizen Login</h2>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Enter one of the 10 seeded NID numbers (e.g. NID-1995827392819) to test live.</p>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <input type="text" id="citizen-query" placeholder="Enter NID or Birth Certificate" style="width: 100%; padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color); outline: none;">
+            <button class="btn" style="width: auto;" id="btn-citizen-login">Login</button>
+        </div>
+    </div>
+
+    <div class="grid-layout" id="citizen-dashboard" style="display: none;">
+        <!-- Left Side: Profile, Active alerts, Alarms & Nurse AI -->
+        <div>
+            <div class="panel-card">
+                <h2>Citizen Profile Information</h2><br>
+                <div class="nid-badge">✓ NID/BRIS Verified Account</div>
+                <p><strong>Name:</strong> <span id="cit-name">-</span></p>
+                <p><strong>NHID Hash:</strong> <span id="cit-nhid">-</span></p>
+                <p><strong>District:</strong> <span id="cit-district">-</span></p>
+                <p id="cit-parent-section" style="display: none; color: var(--accent);"><strong>Parent Linkage:</strong> Authorized under parent NID: <span id="cit-parent-nid">-</span></p>
+            </div>
+
+            <!-- AI Record Scanner (Feature 6) -->
+            <div class="panel-card">
+                <h2>AI Medical Record OCR Scanner</h2>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">Upload older physical reports to parse historical treatments via simulated pattern recognition.</p>
+                <form id="ocr-form">
+                    <div class="form-group">
+                        <label for="ocr-filename">Select Report Document (PDF/Image)</label>
+                        <input type="file" id="ocr-filename" style="padding: 0.4rem;">
+                    </div>
+                    <div class="form-group">
+                        <label for="ocr-text">Or Paste Report Content Text for Simulation</label>
+                        <textarea id="ocr-text" rows="3" placeholder="Paste test results containing keywords like 'Cholera' or 'Diabetes' to run OCR extraction."></textarea>
+                    </div>
+                    <button type="submit" class="btn">🔬 Run AI Scan Extraction</button>
+                </form>
+            </div>
+
+            <!-- Personal Nurse AI Alarm (Feature 6) -->
+            <div class="panel-card">
+                <h2>AI Personal Nurse Agent</h2>
+                <div class="nurse-ai-box">
+                    <p><strong>Personal Nurse Guidance:</strong></p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="nurse-guidelines">Checking active diagnosis history to configure custom medical alarms and advice...</p>
+                </div>
+                <div style="margin-top: 1.25rem;">
+                    <div class="med-alert">
+                        <span style="font-size: 1.5rem;">🔔</span>
+                        <div>
+                            <strong>Amlodipine (Norvasc) 5mg</strong><br>
+                            <span>Daily Morning Alarm: 08:00 AM</span>
+                        </div>
+                    </div>
+                    <div class="med-alert" style="background-color: rgba(16, 185, 129, 0.08); border-left-color: #10b981;">
+                        <span style="font-size: 1.5rem;">💊</span>
+                        <div>
+                            <strong>Atorvastatin (Lipitor) 10mg</strong><br>
+                            <span>Nightly Dosage Alert: 09:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: History, Malpractice Report -->
+        <div>
+            <div class="panel-card">
+                <h2>My Personal treatment history</h2>
+                <div id="cit-history">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Malpractice Reporting (Feature 4) -->
+            <div class="panel-card" style="border: 1px solid var(--danger);">
+                <h2 style="color: var(--danger); border-bottom-color: var(--danger);">Report Malpractice / Poor Service</h2>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1rem;">Report clinical occurrences, malpractice, or staff behavior. Feed log matches public administrative audit panels.</p>
+                <form id="malpractice-form">
+                    <div class="form-group">
+                        <label for="mal-hospital">Select Hospital</label>
+                        <select id="mal-hospital">
+                            <option value="h1">Mymensingh Medical College Hospital</option>
+                            <option value="h2">Rajshahi Medical College Hospital</option>
+                            <option value="h3">Dhaka Medical College Hospital</option>
+                            <option value="h4">Warning Clinic Mymensingh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mal-doctor">Select Doctor (Optional)</label>
+                        <select id="mal-doctor">
+                            <option value="d1">Dr. Sarah Jenkins (Cardiologist)</option>
+                            <option value="d2">Dr. Asif Rahman (Neurologist)</option>
+                            <option value="d3">Dr. Tasnim Ara (Pediatrician)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mal-summary">Incident Summary</label>
+                        <textarea id="mal-summary" rows="3" placeholder="Provide details about poor staff behavior, wrong billing, or equipment neglect" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="mal-rating">Malpractice Rating Severity (1 - Worst, 5 - Mild)</label>
+                        <select id="mal-rating">
+                            <option value="5">5 - Negligible Delay</option>
+                            <option value="4">4 - Poor Communication</option>
+                            <option value="3">3 - Overcharging / Billing Discrepancy</option>
+                            <option value="2">2 - Wrong Medication / Neglect</option>
+                            <option value="1">1 - Severe Malpractice / Critical Injury</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--danger), #ff6b6b);">Report Log Incident</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                toggleBtn.innerHTML = '☀️ Light Mode';
+            } else {
+                toggleBtn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+
+        let patientId = null;
+
+        function refreshTimeline() {
+            if (!patientId) return;
+            const nid = document.getElementById('citizen-query').value;
+            fetch(`/api/search_patient?query=${nid}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const list = document.getElementById('cit-history');
+                        list.innerHTML = '';
+                        if (data.patient.history.length === 0) {
+                            list.innerHTML = '<p>No history records logged.</p>';
+                        } else {
+                            data.patient.history.forEach(h => {
+                                const row = document.createElement('div');
+                                row.className = 'history-row';
+                                row.innerHTML = `
+                                    <div>
+                                        <strong>${h.diagnosis}</strong><br>
+                                        <span style="font-size: 0.85rem; color: #64748b;">${h.hospital_name} (Rating: ${h.hospital_rating})</span>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <strong>${h.doctor_name}</strong><br>
+                                        <span style="font-size: 0.85rem; color: #64748b;">${h.timestamp.split(' ')[0]}</span>
+                                    </div>
+                                `;
+                                list.appendChild(row);
+                            });
+                        }
+                    }
+                });
+        }
+
+        // Login Handler
+        document.getElementById('btn-citizen-login').addEventListener('click', () => {
+            let query = document.getElementById('citizen-query').value;
+            if (!query) return;
+            query = query.trim().toUpperCase();
+            document.getElementById('citizen-query').value = query;
+
+            fetch(`/api/search_patient?query=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        patientId = data.patient.id;
+                        document.getElementById('cit-name').textContent = data.patient.name;
+                        document.getElementById('cit-nhid').textContent = data.patient.nhid;
+                        document.getElementById('cit-district').textContent = data.patient.district;
+
+                        if (data.patient.parent_nid) {
+                            document.getElementById('cit-parent-nid').textContent = data.patient.parent_nid;
+                            document.getElementById('cit-parent-section').style.display = 'block';
+                        } else {
+                            document.getElementById('cit-parent-section').style.display = 'none';
+                        }
+                        
+                        refreshTimeline();
+
+                        // Configure Personal Nurse AI tips based on historical diagnosis
+                        const nurseBox = document.getElementById('nurse-guidelines');
+                        if (data.patient.history.length > 0) {
+                            const lastDiag = data.patient.history[0].diagnosis.toLowerCase();
+                            if (lastDiag.includes("hypertension")) {
+                                nurseBox.innerHTML = "<strong>Hypertension detected:</strong> Restrict salt intake to less than 5g per day. Take your prescribed Amlodipine regularly at 8:00 AM. Avoid stress and perform 30 minutes of mild exercise.";
+                            } else if (lastDiag.includes("migraine")) {
+                                nurseBox.innerHTML = "<strong>Migraine detected:</strong> Avoid loud noises and bright screens. If visual aura begins, take Sumatriptan immediately and rest in a dark, quiet room.";
+                            } else {
+                                nurseBox.innerHTML = "<strong>AI Health Tip:</strong> Maintain hydration (2.5L water daily). Log your symptoms in the patient portal if you experience fever, dehydration, or persistent headaches.";
+                            }
+                        } else {
+                            nurseBox.innerHTML = "No active chronic alerts. General lifestyle advice: Stay hydrated, walk 10k steps, and log any clinical visits.";
+                        }
+
+                        document.getElementById('citizen-dashboard').style.display = 'grid';
+                    } else {
+                        alert('Citizen record not verified in central database.');
+                        document.getElementById('citizen-dashboard').style.display = 'none';
+                    }
+                });
+        });
+
+        // Submit Malpractice Report
+        document.getElementById('malpractice-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!patientId) {
+                alert('Please login first');
+                return;
+            }
+
+            const h_id = document.getElementById('mal-hospital').value;
+            const d_id = document.getElementById('mal-doctor').value;
+            const summary = document.getElementById('mal-summary').value;
+            const rating = document.getElementById('mal-rating').value;
+
+            fetch('/api/submit_malpractice', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    patient_id: patientId,
+                    hospital_id: h_id,
+                    doctor_id: d_id,
+                    incident_summary: summary,
+                    rating: rating
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Malpractice log registered. Incident logged in MOHFW central audit feed.');
+                    document.getElementById('malpractice-form').reset();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // OCR Scan submit
+        document.getElementById('ocr-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!patientId) {
+                alert('Please login first');
+                return;
+            }
+
+            const text = document.getElementById('ocr-text').value || "File: mock_blood_report.pdf containing metformin and glucose logs";
+            
+            fetch('/api/scan_report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    patient_id: patientId,
+                    content: text,
+                    filename: 'mock_uploaded_report.pdf'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`AI OCR Scan completed!\nExtracted Diagnosis: ${data.extracted.diagnosis}\nGeneric Prescribed: ${data.extracted.medications.join(', ')}`);
+                    document.getElementById('ocr-text').value = '';
+                    
+                    // Trigger dynamic encounter addition using mock server endpoint
+                    // to add it to patient timeline
+                    fetch('/api/add_encounter', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            patient_id: patientId,
+                            hospital_id: 'h1',
+                            doctor_id: 'd1',
+                            chief_complaint: 'Mock OCR Scanned Upload',
+                            diagnosis: data.extracted.diagnosis,
+                            prescriptions: data.extracted.medications.map(med => ({
+                                generic_name: med,
+                                brand_name: 'Generic',
+                                dosage: 'As directed',
+                                quantity: 30
+                            }))
+                        })
+                    })
+                    .then(() => {
+                        refreshTimeline();
+                    });
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

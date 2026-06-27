@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHCS - Doctor Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #9b59b6;
+            --warning: #ef4444;
+            --card-border: #e2e8f0;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --accent: #bf55ec;
+            --warning: #ff4757;
+            --card-border: #334155;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .doctor-badge {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #ff6b6b);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .history-item {
+            border-left: 3px solid var(--secondary);
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-item span {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .prescription-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🥼 CHCS Physician Workspace</h1>
+        <button class="mode-toggle" id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <div class="grid-layout">
+        <div>
+            <!-- Doctor Details -->
+            <div class="panel-card">
+                <h2>Verified Clinician Session</h2><br>
+                <div class="doctor-badge">✓ BMDC-Cardio-8392 Active</div>
+                <p><strong>Name:</strong> Dr. Sarah Jenkins</p>
+                <p><strong>Specialization:</strong> Cardiologist</p>
+            </div>
+
+            <!-- Pandemic Outbreak Button (Feature 1) -->
+            <div class="panel-card" style="border: 2px solid var(--warning);">
+                <h2 style="color: var(--warning); border-bottom-color: var(--warning);">Government Epidemic Portal</h2>
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">Report symptoms to trigger real-time AI density clustering on the Ministry dashboard.</p>
+                <form id="outbreak-form">
+                    <div class="form-group">
+                        <label for="outbreak-disease">Suspected Disease Similarity</label>
+                        <select id="outbreak-disease">
+                            <option value="Dengue Fever">Dengue Fever</option>
+                            <option value="Cholera">Cholera Outbreak Strain</option>
+                            <option value="Nipah Virus">Nipah Virus</option>
+                            <option value="Influenza Cluster">Seasonal Influenza H1N1</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="outbreak-symptoms">Observed Symptoms Summary</label>
+                        <input type="text" id="outbreak-symptoms" placeholder="e.g. high fever, severe dehydration" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="outbreak-district">Reporting District Area</label>
+                        <select id="outbreak-district">
+                            <option value="Mymensingh">Mymensingh (MMCH Area)</option>
+                            <option value="Rajshahi">Rajshahi (RMCH Area)</option>
+                            <option value="Dhaka">Dhaka (DMCH Area)</option>
+                            <option value="Chittagong">Chittagong</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning">⚠️ Dispatch Pandemic Outbreak Warning</button>
+                </form>
+            </div>
+
+            <!-- Patient Search -->
+            <div class="panel-card">
+                <h2>Clinical History Search</h2>
+                <div class="form-group">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="patient-search" placeholder="Enter NID or NHID">
+                        <button class="btn" style="width: auto;" id="btn-patient-search">Search</button>
+                    </div>
+                </div>
+
+                <div id="patient-profile" style="display: none;">
+                    <h3>Patient: <span id="pt-name">-</span></h3>
+                    <p style="margin-bottom: 1rem;">NHID: <span id="pt-nhid">-</span> | Gender: <span id="pt-gender">-</span></p>
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <h4>Longitudinal Medical Timeline</h4>
+                        <div id="history-timeline" style="margin-top: 1rem;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Encounter Form -->
+        <div class="panel-card">
+            <h2>Add Clinical Diagnosis & Prescription</h2>
+            <form id="encounter-form">
+                <div class="form-group">
+                    <label for="enc-complaint">Chief Complaint</label>
+                    <input type="text" id="enc-complaint" placeholder="e.g. acute headache, blood pressure spike" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="enc-diagnosis">Diagnosis (ICD-10)</label>
+                    <input type="text" id="enc-diagnosis" placeholder="e.g. Migraine (G43.0)" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Prescribe Generic Medicine</label>
+                    <div id="prescription-container">
+                        <div class="prescription-row">
+                            <input type="text" placeholder="Generic" class="med-generic" required>
+                            <input type="text" placeholder="Brand Name" class="med-brand">
+                            <input type="text" placeholder="Dosage" class="med-dosage" required>
+                            <input type="number" placeholder="Qty" style="width: 70px;" class="med-qty" required>
+                        </div>
+                    </div>
+                    <button type="button" class="btn" style="width: auto; margin-top: 0.5rem; font-size: 0.85rem; padding: 0.5rem 1rem;" id="btn-add-med">+ Add Generic</button>
+                </div>
+
+                <button type="submit" class="btn">Commit Clinical Record & Prescribe</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                toggleBtn.innerHTML = '☀️ Light Mode';
+            } else {
+                toggleBtn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+
+        // Suspected Outbreak Report Dispatch
+        document.getElementById('outbreak-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const disease = document.getElementById('outbreak-disease').value;
+            const symptoms = document.getElementById('outbreak-symptoms').value;
+            const district = document.getElementById('outbreak-district').value;
+
+            fetch('/api/report_outbreak', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    disease: disease,
+                    symptoms: symptoms,
+                    district: district,
+                    hospital_id: 'h1',
+                    doctor_id: 'd1'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Emergency Outbreak Report Dispatched! Symptoms cluster sent to central Ministry AI surveillance.`);
+                    document.getElementById('outbreak-form').reset();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Search Patient
+        let searchedPatientId = null;
+        document.getElementById('btn-patient-search').addEventListener('click', () => {
+            let query = document.getElementById('patient-search').value;
+            if (!query) return;
+            query = query.trim().toUpperCase();
+            document.getElementById('patient-search').value = query;
+
+            fetch(`/api/search_patient?query=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        searchedPatientId = data.patient.id;
+                        document.getElementById('pt-name').textContent = data.patient.name;
+                        document.getElementById('pt-nhid').textContent = data.patient.nhid;
+                        document.getElementById('pt-gender').textContent = data.patient.gender;
+                        document.getElementById('patient-profile').style.display = 'block';
+
+                        // Timeline
+                        const timeline = document.getElementById('history-timeline');
+                        timeline.innerHTML = '';
+                        if (data.patient.history.length === 0) {
+                            timeline.innerHTML = '<p>No previous encounters logged.</p>';
+                        } else {
+                            data.patient.history.forEach(h => {
+                                const div = document.createElement('div');
+                                div.className = 'history-item';
+                                div.innerHTML = `
+                                    <strong>${h.diagnosis} <span style="font-size:0.75rem; color:#64748b;">(Hospital Grade: ${h.hospital_rating})</span></strong><br>
+                                    <span>Complaint: ${h.chief_complaint}</span><br>
+                                    <span>${h.timestamp} | ${h.hospital_name} - ${h.doctor_name}</span>
+                                `;
+                                timeline.appendChild(div);
+                            });
+                        }
+                    } else {
+                        alert('Patient not found');
+                        document.getElementById('patient-profile').style.display = 'none';
+                        searchedPatientId = null;
+                    }
+                });
+        });
+
+        // Add Medicine input row
+        document.getElementById('btn-add-med').addEventListener('click', () => {
+            const container = document.getElementById('prescription-container');
+            const row = document.createElement('div');
+            row.className = 'prescription-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Generic" class="med-generic" required>
+                <input type="text" placeholder="Brand Name" class="med-brand">
+                <input type="text" placeholder="Dosage" class="med-dosage" required>
+                <input type="number" placeholder="Qty" style="width: 70px;" class="med-qty" required>
+            `;
+            container.appendChild(row);
+        });
+
+        // Submit Encounter Form
+        document.getElementById('encounter-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!searchedPatientId) {
+                alert('Please search and view a patient first');
+                return;
+            }
+
+            const complaint = document.getElementById('enc-complaint').value;
+            const diagnosis = document.getElementById('enc-diagnosis').value;
+
+            const medRows = document.querySelectorAll('.prescription-row');
+            const prescriptions = [];
+            medRows.forEach(row => {
+                prescriptions.push({
+                    generic_name: row.querySelector('.med-generic').value,
+                    brand_name: row.querySelector('.med-brand').value || 'Generic',
+                    dosage: row.querySelector('.med-dosage').value,
+                    quantity: row.querySelector('.med-qty').value
+                });
+            });
+
+            fetch('/api/add_encounter', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    patient_id: searchedPatientId,
+                    hospital_id: 'h1', // MMCH
+                    doctor_id: 'd1', // Dr. Sarah Jenkins
+                    chief_complaint: complaint,
+                    diagnosis: diagnosis,
+                    prescriptions: prescriptions
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Clinical records and prescriptions locked and synchronized with central NCHDS databases.');
+                    document.getElementById('encounter-form').reset();
+                    document.getElementById('prescription-container').innerHTML = `
+                        <div class="prescription-row">
+                            <input type="text" placeholder="Generic" class="med-generic" required>
+                            <input type="text" placeholder="Brand Name" class="med-brand">
+                            <input type="text" placeholder="Dosage" class="med-dosage" required>
+                            <input type="number" placeholder="Qty" style="width: 70px;" class="med-qty" required>
+                        </div>
+                    `;
+                    document.getElementById('btn-patient-search').click();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

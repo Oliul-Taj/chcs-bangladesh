@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCHDS - Pharmacy POS Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #27ae60;
+            --card-border: #e2e8f0;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --accent: #2ecc71;
+            --card-border: #334155;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .tin-badge {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--accent);
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .prescription-box {
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-color);
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--card-border);
+        }
+
+        .generic-badge {
+            background-color: #f39c12;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>💊 NCHDS Pharmacy POS Terminal</h1>
+        <button class="mode-toggle" id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Verification and Scan -->
+        <div>
+            <div class="panel-card">
+                <h2>Dispensary Auth Status</h2><br>
+                <div class="tin-badge">✓ NBR BIN-10029384-TIN-839201 Active</div>
+                <p><strong>Store Name:</strong> Lazz Pharma Rajshahi</p>
+                <p><strong>District Location:</strong> Rajshahi</p>
+            </div>
+
+            <div class="panel-card">
+                <h2>Scan Patient Prescription Barcode</h2>
+                <div class="form-group">
+                    <label for="prescription-scan">Scan Barcode / Enter NHID or NID</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="prescription-scan" placeholder="e.g. NHID-5928-3019-5820-9" required>
+                        <button class="btn" style="width: auto;" id="btn-scan">Scan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescribed Items & Dispensing -->
+        <div class="panel-card">
+            <h2>Active Prescription Items</h2>
+            <div id="no-prescription" style="color: #64748b;">
+                Scan barcode or look up a patient to load active generic prescriptions.
+            </div>
+
+            <div id="prescription-display" style="display: none;">
+                <h3>Patient: <span id="disp-pname">-</span></h3>
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">Verification: Authenticated via biometric signature</p>
+                
+                <div id="prescription-items-list">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background-color: rgba(39, 174, 96, 0.05); border-radius: 12px; border-left: 4px solid var(--accent); margin-bottom: 1.5rem;">
+                    <strong>Inventory Synchronization Status:</strong><br>
+                    <span style="font-size: 0.9rem; color: #64748b;">Dispensing will automatically deduct stock from shop databases and synchronize with manufacturing forecasts.</span>
+                </div>
+
+                <button class="btn" style="background: linear-gradient(135deg, var(--accent), #2ecc71);" id="btn-dispense-all">Approve, Deduct Stock & Dispense</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                toggleBtn.innerHTML = '☀️ Light Mode';
+            } else {
+                toggleBtn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+
+        // Scan/Search Handler — RBAC Pharmacy Safe (no clinical history exposed)
+        let activePrescriptions = [];
+        document.getElementById('btn-scan').addEventListener('click', () => {
+            let query = document.getElementById('prescription-scan').value;
+            if (!query) return;
+            query = query.trim().toUpperCase();
+            document.getElementById('prescription-scan').value = query;
+
+            fetch(`/api/pharmacy_prescriptions?query=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('disp-pname').textContent = data.patient_name;
+                        
+                        // Load prescriptions (RBAC: only medicine names/dosage — no clinical data)
+                        const list = document.getElementById('prescription-items-list');
+                        list.innerHTML = '';
+                        activePrescriptions = data.prescriptions;
+
+                        if (activePrescriptions.length === 0) {
+                            list.innerHTML = '<p>No active prescriptions found for this patient.</p>';
+                            document.getElementById('btn-dispense-all').style.display = 'none';
+                        } else {
+                            activePrescriptions.forEach(p => {
+                                const row = document.createElement('div');
+                                row.className = 'prescription-box';
+                                row.innerHTML = `
+                                    <div class="item-row">
+                                        <strong>${p.generic_name} <span class="generic-badge">Generic Match</span></strong>
+                                        <span>Qty: ${p.quantity}</span>
+                                    </div>
+                                    <div style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem; display: flex; justify-content: space-between;">
+                                        <span>Brand: ${p.brand_name} (${p.dosage})</span>
+                                        <span style="color: ${p.dispensed >= p.quantity ? '#ef4444' : '#10b981'}; font-weight: 600;">
+                                            ${p.dispensed >= p.quantity ? 'Already Dispensed' : 'Ready to Dispense'}
+                                        </span>
+                                    </div>
+                                `;
+                                list.appendChild(row);
+                            });
+                            document.getElementById('btn-dispense-all').style.display = 'block';
+                        }
+
+                        document.getElementById('no-prescription').style.display = 'none';
+                        document.getElementById('prescription-display').style.display = 'block';
+                    } else {
+                        alert('Patient/Prescription not found');
+                        document.getElementById('no-prescription').style.display = 'block';
+                        document.getElementById('prescription-display').style.display = 'none';
+                        activePrescriptions = [];
+                    }
+                });
+        });
+
+        // Dispense Handler
+        document.getElementById('btn-dispense-all').addEventListener('click', () => {
+            if (activePrescriptions.length === 0) return;
+
+            // Dispense each undispensed prescription
+            const promises = activePrescriptions
+                .filter(p => p.dispensed < p.quantity)
+                .map(p => {
+                    return fetch('/api/dispense_prescription', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            pharmacy_id: 'ph1', // Lazz Pharma
+                            prescription_id: p.id
+                        })
+                    }).then(res => res.json());
+                });
+
+            if (promises.length === 0) {
+                alert('All items in this prescription have already been dispensed.');
+                return;
+            }
+
+            Promise.all(promises).then(results => {
+                alert('Prescriptions dispensed. Inventory stock updated and synchronized with central NCHDS and NBR platforms.');
+                // Refresh list
+                document.getElementById('btn-scan').click();
+            });
+        });
+    </script>
+</body>
+</html>

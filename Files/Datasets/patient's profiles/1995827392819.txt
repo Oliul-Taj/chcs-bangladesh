@@ -1,0 +1,17 @@
+=== CHCS PATIENT CLINICAL RECORD ===
+NID: 1995827392819
+NHID: NHID-2034-5829-1039-2
+Name: Sarah Jenkins
+DOB: 1995-03-14 | Gender: Female | District: Dhaka
+Access Tier: FULL (Doctor/Patient)
+
+--- CLINICAL HISTORY ---
+[2026-04-12] Dhaka Medical College Hospital (Grade: A+)
+  Complaint: Persistent fatigue and elevated fasting glucose
+  Diagnosis: Type 2 Diabetes Mellitus
+  Doctor: Dr. Khaleda Akter (BMDC-30193, Cardiology)
+  Prescription #pr1: Metformin 850mg — twice daily | Qty: 60
+
+--- ACTIVE ALERTS ---
+- Blood glucose monitoring: fasting target <7 mmol/L
+- Diet: low glycemic index; avoid sugary beverages

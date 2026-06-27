@@ -1,0 +1,9 @@
+Doctor ID,Name,BMDC License,Specialty,Assigned Hospital ID
+d1,Dr. Sarah Jenkins,BMDC-10293,Internal Medicine,h1
+d2,Dr. Asif Rahman,BMDC-20482,Neurology,h2
+d3,Dr. Khaleda Akter,BMDC-30193,Cardiology,h1
+d4,Dr. Mohammed Iqbal,BMDC-40928,Oncology,h3
+d5,Dr. Priya Sharma,BMDC-50193,Pediatrics,h4
+d6,Dr. Tanvir Hossain,BMDC-60284,Emergency Medicine,h2
+d7,Dr. Nasreen Begum,BMDC-70193,Gynecology,h5
+d8,Dr. Rezaul Karim,BMDC-80384,Orthopedics,h3

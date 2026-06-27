@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHCS - Hospital Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #ef4444;
+            --success: #10b981;
+            --card-border: #e2e8f0;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --accent: #ff4757;
+            --card-border: #334155;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .badge-rating {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .billing-summary {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(2, 132, 199, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .billing-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .billing-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏥 CHCS Hospital Registry & Ticketing</h1>
+        <button class="mode-toggle" id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <div class="grid-layout">
+        <!-- Outpatient Registration & Ticketing -->
+        <div>
+            <!-- Hospital Audit Grade -->
+            <div class="panel-card">
+                <h2>Hospital Grade Certification</h2><br>
+                <div class="badge-rating" id="hosp-rating-badge">Grade A+ Certification</div>
+                <p><strong>Name:</strong> Mymensingh Medical College Hospital</p>
+                <p><strong>License Status:</strong> Authorized and Audited</p>
+            </div>
+
+            <!-- Citizen Profile Creation via NID/Passport simulated verify -->
+            <div class="panel-card">
+                <h2>Citizen Registry Verification & Enrollment</h2>
+                <div class="alert alert-success" id="reg-alert">Citizen profile enrolled successfully!</div>
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label for="reg-nid">NID / Passport Number</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="reg-nid" placeholder="e.g. NID-1995827392819" required>
+                            <button type="button" class="btn" style="width: auto;" id="btn-verify-nid">Verify NID</button>
+                        </div>
+                        <span style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem; display: block;">Simulated lookup: queries the NID database to auto-fetch parent names and demographics.</span>
+                    </div>
+
+                    <div id="nid-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name</label>
+                            <input type="text" id="reg-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-dob">Date of Birth</label>
+                            <input type="text" id="reg-dob" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-gender">Gender</label>
+                            <input type="text" id="reg-gender" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-father">Father's Name</label>
+                            <input type="text" id="reg-father" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-mother">Mother's Name</label>
+                            <input type="text" id="reg-mother" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-district">District Code</label>
+                            <input type="text" id="reg-district" required>
+                        </div>
+                        <div class="form-group" id="parent-nid-group" style="display: none;">
+                            <label for="reg-parent-nid" style="color: var(--accent);">Parent NID (Mandatory for Minors < 18)</label>
+                            <input type="text" id="reg-parent-nid" placeholder="Enter Parent NID to authorize">
+                        </div>
+                        <button type="submit" class="btn">Register Profile & Generate NHID</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <!-- Outpatient Admission Form -->
+            <div class="panel-card">
+                <h2>Generate Patient Outpatient Admission Ticket</h2>
+                <div class="alert alert-success" id="ticket-alert">Outpatient Ticket generated successfully!</div>
+                <form id="ticketing-form">
+                    <div class="form-group">
+                        <label for="search-input">Search Patient (NID / NHID)</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="search-input" placeholder="e.g. NHID-5928-3019-5820-9" required>
+                            <button type="button" class="btn" style="width: auto;" id="btn-search">Search</button>
+                        </div>
+                    </div>
+                    
+                    <div id="patient-details" style="display: none; margin-bottom: 1.5rem;">
+                        <p><strong>Name:</strong> <span id="p-name">-</span></p>
+                        <p><strong>Gender:</strong> <span id="p-gender">-</span></p>
+                        <p><strong>DOB:</strong> <span id="p-dob">-</span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctor-select">Assign Doctor</label>
+                        <select id="doctor-select">
+                            <option value="d1">Dr. Sarah Jenkins -MMCH (Cardiologist)</option>
+                            <option value="d2">Dr. Asif Rahman -RMCH (Neurologist)</option>
+                            <option value="d3">Dr. Tasnim Ara -DMCH (Pediatrician)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="complaint-input">Chief Complaint</label>
+                        <input type="text" id="complaint-input" placeholder="e.g. high fever and muscle aches" required>
+                    </div>
+
+                    <button type="submit" class="btn">Generate Outpatient Ticket</button>
+                </form>
+            </div>
+
+            <!-- Dynamic Equipment Quality test Billing -->
+            <div class="panel-card">
+                <h2>Equipment Quality Test & Billing Audit</h2>
+                <form id="billing-form">
+                    <div class="form-group">
+                        <label for="facility-select">Facility Rating</label>
+                        <select id="facility-select">
+                            <option value="A+" data-mult="1.2">Dhaka Medical College (Rating: A+ | Mult: 1.2x)</option>
+                            <option value="A" data-mult="1.0">Rajshahi Medical College (Rating: A | Mult: 1.0x)</option>
+                            <option value="B" data-mult="0.8">Upazila Health Complex (Rating: B | Mult: 0.8x)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="test-select">Select Diagnostic Test</label>
+                        <select id="test-select">
+                            <option value="1500" data-name="Complete Blood Count">Complete Blood Count (Base: 1,500 BDT)</option>
+                            <option value="8000" data-name="Brain MRI (1.5 Tesla)">Brain MRI (1.5 Tesla) (Base: 8,000 BDT)</option>
+                            <option value="4000" data-name="Echocardiogram">Echocardiogram (Base: 4,000 BDT)</option>
+                            <option value="2500" data-name="Ultrasonography">Ultrasonography (Base: 2,500 BDT)</option>
+                        </select>
+                    </div>
+
+                    <div class="billing-summary">
+                        <div class="billing-row">
+                            <span>Test Base Price:</span>
+                            <span id="bill-base">1500 BDT</span>
+                        </div>
+                        <div class="billing-row">
+                            <span>Equipment Multiplier:</span>
+                            <span id="bill-mult">1.2x</span>
+                        </div>
+                        <div class="billing-total">
+                            <span>Audited Final Price:</span>
+                            <span id="bill-total">1800 BDT</span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn" style="margin-top: 1.5rem;" id="btn-bill-submit">Approve & Log Diagnostic Bill</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                toggleBtn.innerHTML = '☀️ Light Mode';
+            } else {
+                toggleBtn.innerHTML = '🌙 Dark Mode';
+            }
+        }
+
+        // Fetch Hospital Grade dynamically
+        fetch('/api/hospital_grade?hospital_id=h1')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('hosp-rating-badge');
+                    badge.textContent = `Grade ${data.details.rating} Certified`;
+                    if (data.details.rating === 'Z') {
+                        badge.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                        badge.style.color = '#ef4444';
+                    }
+                }
+            });
+
+        // NID verify trigger
+        document.getElementById('btn-verify-nid').addEventListener('click', () => {
+            let nid = document.getElementById('reg-nid').value;
+            if (!nid) return;
+            nid = nid.trim().toUpperCase();
+            document.getElementById('reg-nid').value = nid;
+
+            fetch(`/api/nid_verify?nid=${nid}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('reg-name').value = data.record.name;
+                        document.getElementById('reg-dob').value = data.record.dob;
+                        document.getElementById('reg-gender').value = data.record.gender;
+                        document.getElementById('reg-father').value = data.record.father_name;
+                        document.getElementById('reg-mother').value = data.record.mother_name;
+                        document.getElementById('reg-district').value = data.record.district;
+                        
+                        document.getElementById('nid-fields').style.display = 'block';
+
+                        // Check age for minor parent constraint
+                        const birthYear = parseInt(data.record.dob.split('-')[0]);
+                        const currentYear = new Date().getFullYear();
+                        if (currentYear - birthYear < 18) {
+                            document.getElementById('parent-nid-group').style.display = 'block';
+                            document.getElementById('reg-parent-nid').required = true;
+                        } else {
+                            document.getElementById('parent-nid-group').style.display = 'none';
+                            document.getElementById('reg-parent-nid').required = false;
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        });
+
+        // Submit registration profile
+        document.getElementById('registration-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nid = document.getElementById('reg-nid').value.trim().toUpperCase();
+            const name = document.getElementById('reg-name').value;
+            const dob = document.getElementById('reg-dob').value;
+            const gender = document.getElementById('reg-gender').value;
+            const district = document.getElementById('reg-district').value;
+            const parent_nid = document.getElementById('reg-parent-nid').value.trim().toUpperCase();
+
+            fetch('/api/register_patient', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nid: nid,
+                    name: name,
+                    dob: dob,
+                    gender: gender,
+                    district: district,
+                    parent_nid: parent_nid || null
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const alertBox = document.getElementById('reg-alert');
+                    alertBox.textContent = `Citizen Enrolled! Generated NHID: ${data.nhid}`;
+                    alertBox.style.display = 'block';
+                    setTimeout(() => alertBox.style.display = 'none', 6000);
+                    document.getElementById('registration-form').reset();
+                    document.getElementById('nid-fields').style.display = 'none';
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Search Patient API
+        let activePatientId = null;
+        document.getElementById('btn-search').addEventListener('click', () => {
+            let query = document.getElementById('search-input').value;
+            if (!query) return;
+            query = query.trim().toUpperCase();
+            document.getElementById('search-input').value = query;
+
+            fetch(`/api/search_patient?query=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('p-name').textContent = data.patient.name;
+                        document.getElementById('p-gender').textContent = data.patient.gender;
+                        document.getElementById('p-dob').textContent = data.patient.dob;
+                        document.getElementById('patient-details').style.display = 'block';
+                        activePatientId = data.patient.id;
+                    } else {
+                        alert(data.message || 'Patient not found');
+                        document.getElementById('patient-details').style.display = 'none';
+                        activePatientId = null;
+                    }
+                });
+        });
+
+        // Generate Ticket Form
+        document.getElementById('ticketing-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!activePatientId) {
+                alert('Please search and find a verified patient first');
+                return;
+            }
+
+            const doctor_id = document.getElementById('doctor-select').value;
+            const complaint = document.getElementById('complaint-input').value;
+
+            fetch('/api/add_encounter', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    patient_id: activePatientId,
+                    hospital_id: 'h1', // MMCH
+                    doctor_id: doctor_id,
+                    chief_complaint: complaint,
+                    diagnosis: 'Awaiting Examination',
+                    prescriptions: []
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const alertBox = document.getElementById('ticket-alert');
+                    alertBox.style.display = 'block';
+                    setTimeout(() => alertBox.style.display = 'none', 4000);
+                    document.getElementById('ticketing-form').reset();
+                    document.getElementById('patient-details').style.display = 'none';
+                    activePatientId = null;
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Dynamic Billing Calculator
+        const facilitySelect = document.getElementById('facility-select');
+        const testSelect = document.getElementById('test-select');
+        
+        function calculateBill() {
+            const base = parseFloat(testSelect.value);
+            const selectedOpt = facilitySelect.options[facilitySelect.selectedIndex];
+            const multiplier = parseFloat(selectedOpt.getAttribute('data-mult'));
+            
+            document.getElementById('bill-base').textContent = `${base} BDT`;
+            document.getElementById('bill-mult').textContent = `${multiplier}x`;
+            document.getElementById('bill-total').textContent = `${Math.round(base * multiplier)} BDT`;
+        }
+
+        facilitySelect.addEventListener('change', calculateBill);
+        testSelect.addEventListener('change', calculateBill);
+        calculateBill(); // init
+
+        document.getElementById('btn-bill-submit').addEventListener('click', () => {
+            alert('Diagnostic test billing approved and logged in central NBR Audit Engine.');
+        });
+    </script>
+</body>
+</html>

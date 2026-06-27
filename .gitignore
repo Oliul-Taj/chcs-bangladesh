@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Database (don't commit SQLite — use cloud DB on production)
+*.db
+*.sqlite
+*.sqlite3
+lu768679g2qk.tmp
+
+# Env files
+.env
+.env.local
+*.env
+
+# Vercel local
+.vercel/
+
+# Virtual environments
+nchds_temp_env/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db

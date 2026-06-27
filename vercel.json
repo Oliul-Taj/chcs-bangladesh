@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "name": "chcs-bangladesh",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/api/index.py" }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "DATABASE_URL": "@chcs_database_url"
+  }
+}

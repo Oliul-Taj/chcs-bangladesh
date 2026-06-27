@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCHDS Bangladesh - Central Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-color: #1e293b;
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #10b981;
+            --card-border: rgba(226, 232, 240, 0.8);
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text-color: #f1f5f9;
+            --primary: #3b82f6;
+            --secondary: #38bdf8;
+            --card-border: rgba(51, 65, 85, 0.5);
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.05) 0%, transparent 40%);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .mode-toggle:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+            border-color: rgba(30, 58, 138, 0.2);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .footer {
+            margin-top: 4rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" id="theme-toggle">
+        <span id="theme-icon">🌙</span> Dark Mode
+    </button>
+
+    <div class="header">
+        <h1>NCHDS Bangladesh</h1>
+        <p>National Centralized Healthcare Database System. A high-concurrency, unified clinical registry supporting care continuity, real-time auditing, and generic pharmaceutical tracking for 175M citizens.</p>
+    </div>
+
+    <div class="grid">
+        <!-- Card 1: Ministry -->
+        <div class="card" onclick="window.open('/ministry', '_blank')">
+            <div>
+                <div class="icon">🏛️</div>
+                <h2>Central Ministry</h2>
+                <p>Supreme governance dashboard with live health metrics, disease outbreak mapping, and national medicine demand projections.</p>
+            </div>
+            <a href="/ministry" target="_blank" class="btn">Open Admin Panel</a>
+        </div>
+
+        <!-- Card 2: Hospital -->
+        <div class="card" onclick="window.open('/hospital', '_blank')">
+            <div>
+                <div class="icon">🏥</div>
+                <h2>Hospital Panel</h2>
+                <p>Inpatient ticketing, doctor scheduling, dynamic test billing, and medical equipment performance auditing.</p>
+            </div>
+            <a href="/hospital" target="_blank" class="btn">Open Hospital Panel</a>
+        </div>
+
+        <!-- Card 3: Doctor -->
+        <div class="card" onclick="window.open('/doctor', '_blank')">
+            <div>
+                <div class="icon">🥼</div>
+                <h2>Doctor Portal</h2>
+                <p>Verified clinical framework with BMDC registry, longitudinal patient charts, task allocations, and drug allergy cross-checks.</p>
+            </div>
+            <a href="/doctor" target="_blank" class="btn">Open Doctor Portal</a>
+        </div>
+
+        <!-- Card 4: Patient -->
+        <div class="card" onclick="window.open('/patient', '_blank')">
+            <div>
+                <div class="icon">📱</div>
+                <h2>Patient Portal</h2>
+                <p>Personal health records, automated medication alerts, prescription limit tracking, and local pharmacy mapping.</p>
+            </div>
+            <a href="/patient" target="_blank" class="btn">Open Patient App</a>
+        </div>
+
+        <!-- Card 5: Dispensary -->
+        <div class="card" onclick="window.open('/pharmacy', '_blank')">
+            <div>
+                <div class="icon">💊</div>
+                <h2>Dispensary Shop</h2>
+                <p>BIN/TIN verified POS for prescription barcode scanning, inventory digitalization, and generic medicine matching.</p>
+            </div>
+            <a href="/pharmacy" target="_blank" class="btn">Open Dispensary POS</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        Mir Oliul Pasha Taj | Rajshahi University of Engineering & Technology (RUET)
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Load initial theme from localStorage
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateToggleBtn(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleBtn(newTheme);
+        });
+
+        function updateToggleBtn(theme) {
+            if (theme === 'dark') {
+                themeIcon.textContent = '☀️';
+                toggleBtn.innerHTML = '<span id="theme-icon">☀️</span> Light Mode';
+            } else {
+                themeIcon.textContent = '🌙';
+                toggleBtn.innerHTML = '<span id="theme-icon">🌙</span> Dark Mode';
+            }
+        }
+    </script>
+</body>
+</html>

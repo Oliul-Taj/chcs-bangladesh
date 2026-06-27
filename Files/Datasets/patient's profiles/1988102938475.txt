@@ -1,0 +1,23 @@
+=== CHCS PATIENT CLINICAL RECORD ===
+NID: 1988102938475
+NHID: NHID-1029-3847-5820-1
+Name: Mir Oliul Pasha Taj
+DOB: 1988-06-15 | Gender: Male | District: Rajshahi
+Access Tier: FULL (Doctor/Patient)
+
+--- CLINICAL HISTORY ---
+[2026-05-20] Rajshahi Medical College Hospital (Grade: A)
+  Complaint: Recurrent throbbing headaches
+  Diagnosis: Migraine with Aura
+  Doctor: Dr. Asif Rahman (BMDC-20482, Neurology)
+  Prescription #pr5: Sumatriptan (Imitrex) 50mg — as needed | Qty: 6
+
+[2026-06-18] Mymensingh Medical College Hospital (Grade: A+)
+  Complaint: Elevated blood pressure measurements
+  Diagnosis: Essential Hypertension
+  Doctor: Dr. Sarah Jenkins (BMDC-10293, Internal Medicine)
+  Prescription #pr6: Amlodipine (Norvasc) 5mg — 1 daily | Qty: 30
+
+--- ACTIVE ALERTS ---
+- Hypertension monitoring: restrict salt <5g/day
+- Migraine: avoid bright screens / loud noise; Sumatriptan on aura onset

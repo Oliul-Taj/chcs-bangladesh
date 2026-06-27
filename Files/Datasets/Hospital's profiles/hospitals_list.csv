@@ -1,0 +1,6 @@
+Hospital ID,Name,License Num,Category,Geo Location (Lat,Lon),Daily Patient Serve Count,Free Medicine Stock Summary
+h1,Mymensingh Medical College Hospital,MH-10293,Public Government,"24.7466,90.4070",1200,"Paracetamol: 5000 tabs; ORS: 500 pkts; Metformin: 2000 tabs"
+h2,Rajshahi Medical College Hospital,MH-20384,Public Government,"24.3636,88.6241",980,"Amlodipine: 3000 tabs; Omeprazole: 1500 tabs; Azithromycin: 800 caps"
+h3,Dhaka Medical College Hospital,MH-30192,Public Government,"23.7261,90.3890",2500,"Paracetamol: 10000 tabs; IV Saline: 2000 bags; Insulin: 500 vials"
+h4,Chittagong Medical College Hospital,MH-40293,Public Government,"22.3675,91.7996",1100,"Salbutamol: 300 inhalers; Metformin: 1500 tabs; ORS: 600 pkts"
+h5,Sylhet MAG Osmani Medical College Hospital,MH-50184,Public Government,"24.8949,91.8687",750,"Omeprazole: 2000 tabs; Paracetamol: 4000 tabs; Amlodipine: 1000 tabs"
